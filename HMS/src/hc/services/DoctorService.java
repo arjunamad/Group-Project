@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import hc.beans.Appoinment;
@@ -42,30 +43,35 @@ public class DoctorService {
 
 	}
 
-	public static List<Appoinment> getApposOfDate(Date date, String email) throws Exception {
+	public static List<Appoinment> getApposOfDate(int session, Date date, String email) throws Exception {
 		User user = UserService.getUserFromEmail(email);
-		String sql = "SELECT * from appointment where date=?";
+		String sql = "SELECT * from `appointment` where day(`date`)=? and month(`date`)=? and year(`date`)=?  and session_id=?";
 		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
-		statement.setDate(1, date);
-		
-		ResultSet r=statement.executeQuery();
-		List<Appoinment> appos=new ArrayList<>();
-		while(r.next()) {
-			appos.add(new Appoinment(r.getDate("date"), r.getInt("number"), r.getInt("paid"), r.getLong("patient_id"),r.getLong("session_id")));
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		statement.setInt(1, cal.get(Calendar.DAY_OF_MONTH));
+		statement.setInt(2, cal.get(Calendar.MONTH)+1);
+		statement.setInt(3, cal.get(Calendar.YEAR));
+		statement.setInt(4, session);
+		ResultSet r = statement.executeQuery();
+		List<Appoinment> appos = new ArrayList<>();
+		while (r.next()) {
+			appos.add(new Appoinment(r.getDate("date"), r.getInt("number"), r.getInt("paid"), r.getLong("patient_id"),
+					r.getLong("session_id")));
 		}
 		return appos;
 	}
-	
-	public static boolean createSession(DoctorSession session,String email) throws Exception{
-		String sql="INSERT INTO `doctor_session`( `day`, `max_count`, `doctor_id`, `description`, `price`) VALUES (?,?,?,?,? )";
-		
-		PreparedStatement statement=DbContext.getConnection().prepareStatement(sql);
+
+	public static boolean createSession(DoctorSession session, String email) throws Exception {
+		String sql = "INSERT INTO `doctor_session`( `day`, `max_count`, `doctor_id`, `description`, `price`) VALUES (?,?,?,?,? )";
+
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
 		statement.setString(1, session.getDay());
 		statement.setInt(2, session.getMaxCount());
 		statement.setLong(3, UserService.getUserFromEmail(email).getId());
 		statement.setString(4, session.getDescription());
 		statement.setDouble(5, session.getPrice());
-		
+
 		return statement.execute();
 	}
 }

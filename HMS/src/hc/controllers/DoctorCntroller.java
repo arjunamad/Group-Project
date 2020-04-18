@@ -39,15 +39,16 @@ public class DoctorCntroller {
 		return DoctorService.all();
 	}
 
-	@Path("appos/{date}")
+	@Path("appos/{date}/{session}")
 	@GET
 	@RolesAllowed("ROLE_DOCTOR")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Appoinment> appos(@PathParam("date") Date date, @Context ContainerRequestContext crc) throws Exception {
-		return DoctorService.getApposOfDate(date, crc.getProperty("username").toString());
+	public List<Appoinment> appos(@PathParam("date") String date,@PathParam("session") int session, @Context ContainerRequestContext crc) throws Exception {
+		Date dt=Date.valueOf(date);
+		return DoctorService.getApposOfDate(session,dt, crc.getProperty("username").toString());
 	}
 	
-	@PathParam("crete-session")
+	@Path("crete-session")
 	@POST
 	@RolesAllowed("ROLE_DOCTOR")
 	@Produces(MediaType.APPLICATION_JSON)
