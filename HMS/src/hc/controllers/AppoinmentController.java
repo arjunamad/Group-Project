@@ -39,7 +39,8 @@ public class AppoinmentController {
 	public List<Appoinment> userAppoinments(@Context ContainerRequestContext crc) throws Exception {
 		return AppoinmentService.userAppoinment(crc.getProperty("username").toString());
 	}
-	 @Path("pay/{appoId}")
+	
+	@Path("pay/{appoId}")
 	@GET
 	@RolesAllowed("ROLE_USER")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -53,5 +54,3 @@ public class AppoinmentController {
 	}
 	
 }
-
-	
