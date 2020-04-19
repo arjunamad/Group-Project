@@ -71,7 +71,25 @@ public class DoctorService {
 		statement.setLong(3, UserService.getUserFromEmail(email).getId());
 		statement.setString(4, session.getDescription());
 		statement.setDouble(5, session.getPrice());
+		return statement.execute();
+	}
+	
+	public static boolean delete (Long id) throws Exception {
+		String sql = "DELETE FROM `doctor_session` WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setLong(1, id);
+		return statement.execute();
+	}
 
+	public static boolean update (DoctorSession a, Long id) throws Exception {
+		String sql = "UPDATE `doctor_session` SET  `day`=?,`max_count`=?,`doctor_id`=?,`description`=?,`price`=? WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		 statement.setString(1, a.getDay());
+		 statement.setInt(2, a.getMaxCount());
+		 statement.setLong(3, a.getDoctorId());
+		 statement.setString(4, a.getDescription());
+		 statement.setDouble(5, a.getPrice());
+		 statement.setLong(6, a.getId());
 		return statement.execute();
 	}
 }
