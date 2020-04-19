@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hc.beans.Appoinment;
+import hc.beans.DoctorSession;
 import hc.beans.Payment;
+import hc.beans.RawPayment;
 import hc.beans.User;
 import hc.suport.DbContext;
 
@@ -80,7 +82,7 @@ public class AppoinmentService {
 		List<Payment> payments = new ArrayList<Payment>();
 		while (r.next()) {
 			payments.add(new Payment(r.getDate("date"), r.getDate("session_date"), r.getString("description"),
-					getNameOfUser(r.getLong("pid")),getNameOfUser(r.getLong("did"))));
+					getNameOfUser(r.getLong("pid")), getNameOfUser(r.getLong("did"))));
 		}
 		return payments;
 	}
@@ -97,4 +99,39 @@ public class AppoinmentService {
 		return "";
 	}
 
+	public static boolean deleteAppo(Long id) throws Exception {
+		String sql = "DELETE FROM `appointment` WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setLong(1, id);
+		return statement.execute();
+	}
+
+	public static boolean updateAppo(Appoinment a, Long id) throws Exception {
+		String sql = "UPDATE `appointment` SET `date`=?,`number`=?,`paid`=?,`patient_id`=?,`session_id`=? WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setDate(1, a.getDate());
+		statement.setInt(2, a.getNumber());
+		statement.setInt(3, a.getPaid());
+		statement.setLong(4, a.getPatientId());
+		statement.setLong(5, a.getSessionId());
+		statement.setLong(6, id);
+		return statement.execute();
+	}
+	
+	public static boolean deletePayment (Long id) throws Exception {
+		String sql = "DELETE FROM `payments` WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setLong(1, id);
+		return statement.execute();
+	}
+
+	public static boolean updatePayment (RawPayment a, Long id) throws Exception {
+		String sql = "UPDATE `payments` SET  `date`=?,`price`=?,`appinment_id`=? WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setDate(1, a.getDate());
+		statement.setDouble(2, a.getPrice());
+		statement.setLong(3, a.getAppoId());
+		statement.setLong(4, a.getId());
+		return statement.execute();
+	}
 }
