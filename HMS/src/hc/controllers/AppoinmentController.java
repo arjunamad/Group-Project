@@ -3,8 +3,11 @@ package hc.controllers;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -39,7 +42,7 @@ public class AppoinmentController {
 	public List<Appoinment> userAppoinments(@Context ContainerRequestContext crc) throws Exception {
 		return AppoinmentService.userAppoinment(crc.getProperty("username").toString());
 	}
-	
+
 	@Path("pay/{appoId}")
 	@GET
 	@RolesAllowed("ROLE_USER")
@@ -52,5 +55,32 @@ public class AppoinmentController {
 			return SingleResponse.error(e);
 		}
 	}
-	
+
+	@Path("delete/{id}")
+	@DELETE
+	@RolesAllowed("ROLE_ADMIN")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SingleResponse delete(@PathParam("id") Long id) {
+		try {
+			AppoinmentService.deleteAppo(id);
+			return SingleResponse.ok("Success");
+		} catch (Exception e) {
+			return SingleResponse.error(e);
+		}
+	}
+
+	@PathParam("update/{id}")
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@RolesAllowed("ROLE_ADMIN")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SingleResponse update(@PathParam("id") Long id, Appoinment a) {
+		try {
+			AppoinmentService.updateAppo(a, id);
+			return SingleResponse.ok("Success");
+		} catch (Exception e) {
+			return SingleResponse.error(e);
+		}
+	}
+
 }
