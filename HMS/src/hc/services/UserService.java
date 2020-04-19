@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Set;
 
+import hc.beans.DoctorSession;
 import hc.beans.User;
 import hc.suport.DbContext;
 
@@ -76,5 +77,33 @@ public class UserService {
 			hashtext = "0" + hashtext;
 		}
 		return hashtext;
+	}
+
+	public static boolean delete(Long id) throws Exception {
+		String sql = "DELETE FROM `users` WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setLong(1, id);
+		return statement.execute();
+	}
+
+	public static boolean update(User a, Long id) throws Exception {
+		String sql = "UPDATE `users` SET  `email`=?,`name`=?,`password`=?,`role_id`=? WHERE `id`=?";
+		PreparedStatement statement = DbContext.getConnection().prepareStatement(sql);
+		statement.setString(1, a.getEmail());
+		statement.setString(2, a.getName());
+		statement.setString(3, toMd5(a.getPassword()));
+		switch (a.getRole()) {
+		case "DOCTOR":
+			statement.setInt(4, 2);
+			break;
+		case "USER":
+			statement.setInt(4, 1);
+			break;
+		case "ADMIN":
+			statement.setInt(4, 3);
+			break;
+		}
+		statement.setLong(5, a.getId());
+		return statement.execute();
 	}
 }
